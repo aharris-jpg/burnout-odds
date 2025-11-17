@@ -1,0 +1,409 @@
+<!-- Vegas Insider – Winter Burnout Odds Index 2025 (Hero Widget) -->
+<div class="wb-hero-widget"></div>
+<script>
+(function () {
+  const host = document.currentScript.previousElementSibling;
+  if (!host || !host.classList.contains('wb-hero-widget')) return;
+
+  const shadow = host.attachShadow({ mode: 'open' });
+  const uid = 'wb' + Math.random().toString(36).slice(2, 8);
+  const CANONICAL_URL = 'https://www.vegasinsider.com/winter-burnout-odds-index-2025';
+
+  shadow.innerHTML = `
+    <section class="wb-hero" role="region" aria-labelledby="wb-hero-title-${uid}">
+      <style>
+        :host,
+        .wb-hero,
+        .wb-hero * {
+          box-sizing: border-box;
+        }
+
+        .wb-hero {
+          --ink:#17222f;
+          --ink-soft:#5d6a79;
+          --ink-muted:#7e8896;
+          --shell:#f6f7fb;
+          --shell-soft:#f1f3f9;
+          --accent:#ff4d5c;
+          --accent-soft:#ffe5e7;
+          --accent-gold:#ffb54c;
+          --accent-blue:#4a7dff;
+          --badge-bg:#eef1f7;
+          --card-border:rgba(12, 22, 39, 0.06);
+
+          max-width: 980px;
+          margin: 0 auto;
+          padding: 1.4rem 1.6rem 1.6rem;
+          border-radius: 18px;
+          background: radial-gradient(circle at top left,#ffffff 0,#f8f9fd 46%,#f2f4fb 100%);
+          box-shadow: 0 14px 28px rgba(0,0,0,0.06);
+          border: 1px solid rgba(12,22,39,0.04);
+          font: 15px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          color: var(--ink);
+          position: relative;
+        }
+
+        .wb-hero::before {
+          content: "";
+          position: absolute;
+          inset: 0 0 auto;
+          height: 3px;
+          background: linear-gradient(90deg, #4a7dff, #52c2ff, #ffb54c, #ff4d5c);
+          border-top-left-radius: 18px;
+          border-top-right-radius: 18px;
+        }
+
+        .wb-hero__eyebrow {
+          margin-top: 0.25rem;
+          text-transform: uppercase;
+          letter-spacing: 0.09em;
+          font-size: 0.78rem;
+          font-weight: 700;
+          color: var(--ink-muted);
+        }
+
+        .wb-hero__title {
+          margin: 0.15rem 0 0.25rem;
+          font-size: 1.55rem;
+          font-weight: 800;
+          letter-spacing: -0.01em;
+        }
+
+        .wb-hero__subtitle {
+          margin: 0;
+          font-size: 0.95rem;
+          color: var(--ink-soft);
+          max-width: 640px;
+        }
+
+        .wb-hero__grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 1.1rem;
+          margin-top: 1.3rem;
+        }
+
+        .wb-card {
+          border-radius: 14px;
+          padding: 0.9rem 1rem 1rem;
+          background: #ffffff;
+          border: 1px solid var(--card-border);
+          box-shadow: 0 8px 18px rgba(3,18,38,0.03);
+          position: relative;
+        }
+
+        .wb-card--state {
+          background: radial-gradient(circle at top left, #ffecef, #ffffff 55%);
+          border-color: rgba(255,77,92,0.24);
+        }
+
+        .wb-card--profession {
+          background: radial-gradient(circle at top right, #fff4df, #ffffff 55%);
+          border-color: rgba(255,181,76,0.32);
+        }
+
+        .wb-card--gender {
+          background: radial-gradient(circle at top, #e7f0ff, #ffffff 62%);
+          border-color: rgba(74,125,255,0.26);
+        }
+
+        .wb-card__label {
+          font-size: 0.78rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.09em;
+          color: var(--ink-muted);
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+        }
+
+        .wb-card__chip {
+          width: 9px;
+          height: 9px;
+          border-radius: 999px;
+          background: var(--ink-muted);
+        }
+
+        .wb-card--state .wb-card__chip { background: var(--accent); }
+        .wb-card--profession .wb-card__chip { background: var(--accent-gold); }
+        .wb-card--gender .wb-card__chip { background: var(--accent-blue); }
+
+        .wb-card__title {
+          margin: 0.45rem 0 0.3rem;
+          font-size: 1.02rem;
+          font-weight: 700;
+        }
+
+        .wb-card__headline {
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+          gap: 0.5rem;
+          margin-bottom: 0.4rem;
+        }
+
+        .wb-card__percent {
+          font-size: 2.2rem;
+          line-height: 1;
+          font-weight: 800;
+        }
+
+        .wb-card__odds {
+          text-align: right;
+          font-size: 0.75rem;
+          color: var(--ink-soft);
+          white-space: nowrap;
+        }
+
+        .wb-card__odds strong {
+          display: block;
+          font-size: 0.98rem;
+          font-weight: 700;
+          color: var(--ink);
+        }
+
+        .wb-badges {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.35rem;
+          margin: 0 0 0.45rem;
+        }
+
+        .wb-badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 0.12rem 0.5rem;
+          border-radius: 999px;
+          font-size: 0.74rem;
+          background: var(--badge-bg);
+          color: var(--ink-soft);
+          border: 1px solid rgba(22,32,44,0.04);
+        }
+
+        .wb-card--state .wb-badge:first-child {
+          background: rgba(255,77,92,0.06);
+          color: #a02b37;
+        }
+        .wb-card--profession .wb-badge:first-child {
+          background: rgba(255,181,76,0.09);
+          color: #96561a;
+        }
+        .wb-card--gender .wb-badge:first-child {
+          background: rgba(74,125,255,0.08);
+          color: #23448f;
+        }
+
+        .wb-card__body {
+          margin: 0;
+          font-size: 0.86rem;
+          color: var(--ink-soft);
+        }
+
+        /* Gender block */
+        .wb-gender-headline {
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+          gap: 0.4rem;
+          margin-bottom: 0.35rem;
+        }
+
+        .wb-gender__percent {
+          font-size: 1.7rem;
+          font-weight: 800;
+        }
+
+        .wb-gender__meta {
+          font-size: 0.78rem;
+          text-align: right;
+          color: var(--ink-soft);
+        }
+
+        .wb-gender__meta strong {
+          display: block;
+          font-weight: 700;
+          font-size: 0.9rem;
+          color: var(--ink);
+        }
+
+        .wb-gender-bars {
+          margin: 0.4rem 0 0.4rem;
+        }
+
+        .wb-gender-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.5rem;
+          margin-bottom: 0.22rem;
+          font-size: 0.78rem;
+        }
+
+        .wb-gender-label {
+          white-space: nowrap;
+          color: var(--ink-soft);
+        }
+
+        .wb-gender-track {
+          flex: 1;
+          height: 7px;
+          border-radius: 999px;
+          background: #e4e8f3;
+          overflow: hidden;
+        }
+
+        .wb-gender-fill {
+          height: 100%;
+          width: 0;
+          border-radius: inherit;
+          background: linear-gradient(90deg,#ff4d5c,#ffb54c);
+        }
+
+        .wb-gender-fill--men {
+          background: linear-gradient(90deg,#4a7dff,#8fd2ff);
+        }
+
+        .wb-gender-value {
+          width: 3.1rem;
+          text-align: right;
+          color: var(--ink-soft);
+        }
+
+        .wb-card__subcopy {
+          margin: 0.4rem 0 0;
+          font-size: 0.8rem;
+          color: var(--ink-soft);
+        }
+
+        .wb-hero__footer {
+          margin-top: 1.05rem;
+          padding-top: 0.8rem;
+          border-top: 1px solid rgba(12,22,39,0.08);
+          font-size: 0.8rem;
+          color: var(--ink-muted);
+        }
+
+        .wb-hero__footer a {
+          color: var(--accent-blue);
+          text-decoration: none;
+        }
+
+        .wb-hero__footer a:hover {
+          text-decoration: underline;
+        }
+
+        @media (max-width: 860px) {
+          .wb-hero {
+            padding: 1.1rem 1.1rem 1.4rem;
+          }
+          .wb-hero__grid {
+            grid-template-columns: minmax(0, 1fr);
+          }
+        }
+      </style>
+
+      <header class="wb-hero__head">
+        <div class="wb-hero__eyebrow">Vegas Insider · Data-Driven Odds</div>
+        <h2 id="wb-hero-title-${uid}" class="wb-hero__title">Winter Burnout Odds Index 2025</h2>
+        <p class="wb-hero__subtitle">
+          A data-led look at where winter burnout hits hardest — by state, profession, and gender —
+          using the same implied-probability logic behind Vegas odds.
+        </p>
+      </header>
+
+      <div class="wb-hero__grid" aria-label="Winter burnout highlights">
+        <!-- Highest-risk state -->
+        <article class="wb-card wb-card--state" aria-label="Highest-risk state for winter burnout">
+          <div class="wb-card__label">
+            <span class="wb-card__chip" aria-hidden="true"></span>
+            Highest-Risk State
+          </div>
+          <h3 class="wb-card__title">Louisiana</h3>
+          <div class="wb-card__headline">
+            <span class="wb-card__percent">6.51%</span>
+            <div class="wb-card__odds">
+              <strong>+1436</strong>
+              implied burnout odds
+            </div>
+          </div>
+          <div class="wb-badges" aria-hidden="true">
+            <span class="wb-badge">High anxiety &amp; cost burden</span>
+            <span class="wb-badge">Low winter activity</span>
+          </div>
+          <p class="wb-card__body">
+            Heavy essential costs and elevated anxiety push Louisiana to the top of the winter burnout table.
+          </p>
+        </article>
+
+        <!-- Highest-risk profession -->
+        <article class="wb-card wb-card--profession" aria-label="Highest-risk profession for winter burnout">
+          <div class="wb-card__label">
+            <span class="wb-card__chip" aria-hidden="true"></span>
+            Highest-Risk Profession
+          </div>
+          <h3 class="wb-card__title">Hospital Nurse (Inpatient)</h3>
+          <div class="wb-card__headline">
+            <span class="wb-card__percent">6.90%</span>
+            <div class="wb-card__odds">
+              <strong>+1349</strong>
+              burnout moneyline
+            </div>
+          </div>
+          <div class="wb-badges" aria-hidden="true">
+            <span class="wb-badge">Winter caseload surge</span>
+            <span class="wb-badge">High emotional demand</span>
+          </div>
+          <p class="wb-card__body">
+            Long shifts, winter surges, and constant emotional load give inpatient nurses the steepest odds curve.
+          </p>
+        </article>
+
+        <!-- Gender burnout gap -->
+        <article class="wb-card wb-card--gender" aria-label="Gender burnout gap in winter">
+          <div class="wb-card__label">
+            <span class="wb-card__chip" aria-hidden="true"></span>
+            Gender Burnout Gap
+          </div>
+          <h3 class="wb-card__title">Women vs. Men</h3>
+          <div class="wb-gender-headline">
+            <span class="wb-gender__percent">+45%</span>
+            <div class="wb-gender__meta">
+              <strong>4.2% vs. 2.9%</strong>
+              modeled burnout odds
+            </div>
+          </div>
+
+          <div class="wb-gender-bars" aria-hidden="true">
+            <div class="wb-gender-row">
+              <span class="wb-gender-label">Women</span>
+              <div class="wb-gender-track">
+                <div class="wb-gender-fill" style="width:70%;"></div>
+              </div>
+              <span class="wb-gender-value">4.2%</span>
+            </div>
+            <div class="wb-gender-row">
+              <span class="wb-gender-label">Men</span>
+              <div class="wb-gender-track">
+                <div class="wb-gender-fill wb-gender-fill--men" style="width:48%;"></div>
+              </div>
+              <span class="wb-gender-value">2.9%</span>
+            </div>
+          </div>
+
+          <p class="wb-card__subcopy">
+            Women enter winter with higher emotional load and more unpaid labor, pushing their modeled burnout odds higher.
+          </p>
+        </article>
+      </div>
+
+      <p class="wb-hero__footer">
+        <strong>Note:</strong> Odds reflect modeled burnout probability, not diagnosis — calculated using national health, work,
+        and cost data. View the full study at
+        <a href="\${CANONICAL_URL}" target="_blank" rel="noopener">Vegas Insider’s Winter Burnout Odds Index 2025</a>.
+      </p>
+    </section>
+  `;
+
+})();
+</script>
