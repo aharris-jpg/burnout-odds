@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Winter Burnout Odds Index 2025 — Burnout Probability by U.S. State</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="VegasInsider’s Winter Burnout Odds Index 2025 estimates winter burnout probability and implied odds across all 50 U.S. states, based on health, work, cost, activity, and anxiety data." />
+
+  <!-- D3 + TopoJSON -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+
+  <style>
+    :root {
+      --ink:#17222f;
+      --ink-soft:#5d6a79;
+      --ink-muted:#7e8896;
+      --shell:#f6f7fb;
+      --shell-soft:#f1f3f9;
+      --white:#ffffff;
+      --border:#dde2f0;
+      --border-soft:rgba(12,22,39,0.08);
+      --radius:16px;
+      --shadow:0 14px 28px rgba(0,0,0,0.06);
+      --font-main:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+
+      /* Map gradient (medium contrast) */
+      --low-1:#A5C6FF;
+      --low-2:#82AFFF;
+      --mid-1:#FFD08A;
+      --mid-2:#FFB866;
+      --high-1:#F88A50;
+      --high-2:#E24A3B;
+    }
+
+    *{box-sizing:border-box;}
+
+    body{
+      margin:0;
+      padding:2.4rem 1.4rem 3.4rem;
+      background:var(--shell);
+      font-family:var(--font-main);
+      color:var(--ink);
+    }
+
+    main{
+      max-width:1100px;
+      margin:0 auto;
+    }
+
+    .card{
+      background:var(--white);
+      border-radius:var(--radius);
+      border:1px solid rgba(12,22,39,0.06);
+      box-shadow:var(--shadow);
+      padding:1.6rem 1.7rem 1.8rem;
+    }
+
+    h1{
+      margin:0 0 .25rem;
+      font-size:1.7rem;
+      letter-spacing:-0.01em;
+      font-weight:800;
+    }
+
+    .eyebrow{
+      text-transform:uppercase;
+      letter-spacing:.09em;
+      font-size:.78rem;
+      font-weight:700;
+      color:var(--ink-muted);
+      margin-bottom:.2rem;
+    }
+
+    .subhead{
+      margin:.05rem 0 1rem;
+      font-size:.9rem;
+      color:var(--ink-soft);
+    }
+
+    .gradient-bar-labels{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:.78rem;
+      color:var(--ink-soft);
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      margin-top:.75rem;
+      margin-bottom:.35rem;
+    }
+
+    .gradient-strip{
+      height:10px;
+      border-radius:999px;
+      background:linear-gradient(90deg,
+        var(--low-1) 0%,
+        var(--low-2) 18%,
+        var(--mid-1) 40%,
+        var(--mid-2) 62%,
+        var(--high-1) 82%,
+        var(--high-2) 100%);
+      border:1px solid rgba(12,22,39,0.08);
+    }
+
+    .map-wrapper{
+      width:100%;
+      margin-top:1rem;
+      border-radius:14px;
+      overflow:hidden;
+      border:1px solid #dde2f0;
+      background:#f9fafc;
+    }
+
+    svg#burnout-map{
+      width:100%;
+      height:auto;
+      display:block;
+    }
+
+    .state{
+      stroke:#ffffff;
+      stroke-width:.5;
+      cursor:default;
+    }
+    .state:hover{
+      stroke:#111827;
+      stroke-width:.85;
+    }
+
+    .map-caption{
+      font-size:.82rem;
+      color:var(--ink-soft);
+      margin-top:.55rem;
+      line-height:1.5;
+    }
+    .map-caption--source{
+      font-size:.8rem;
+      color:var(--ink-muted);
+      margin-top:.3rem;
+    }
+
+    .tooltip{
+      position:absolute;
+      pointer-events:none;
+      background:#ffffff;
+      border-radius:10px;
+      border:1px solid rgba(12,22,39,0.12);
+      box-shadow:0 10px 24px rgba(0,0,0,0.16);
+      padding:.55rem .7rem;
+      font-size:.8rem;
+      color:var(--ink);
+      display:none;
+      max-width:220px;
+      z-index:20;
+    }
+    .tooltip strong{
+      display:block;
+      margin-bottom:.15rem;
+      font-size:.82rem;
+    }
+    .tooltip span{
+      display:block;
+      color:var(--ink-soft);
+    }
+
+    .tables-wrapper{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:1.35rem;
+      margin-top:1.1rem;
+    }
+
+    h2{
+      font-size:1.05rem;
+      margin:1.35rem 0 .45rem;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:.86rem;
+    }
+    th,td{
+      padding:.45rem .35rem;
+      text-align:left;
+    }
+    th{
+      font-size:.78rem;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:var(--ink-muted);
+      border-bottom:1px solid rgba(12,22,39,0.08);
+    }
+    tr:nth-child(even) td{
+      background:rgba(12,22,39,0.02);
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:1.55rem;
+      padding:.08rem .4rem;
+      border-radius:999px;
+      font-size:.7rem;
+      font-weight:700;
+    }
+    .pill--high{
+      background:rgba(226,74,59,0.12);
+      color:#9b261d;
+    }
+    .pill--low{
+      background:rgba(130,175,255,0.16);
+      color:#21407f;
+    }
+
+    .share{
+      margin-top:1.4rem;
+      padding-top:.9rem;
+      border-top:1px solid rgba(12,22,39,0.08);
+    }
+    .share h3{
+      margin:0 0 .4rem;
+      font-size:.9rem;
+    }
+
+    .embed-toggle{
+      appearance:none;
+      border:1px solid var(--border);
+      background:#ffffff;
+      border-radius:8px;
+      padding:.45rem .9rem;
+      font-size:.83rem;
+      font-weight:700;
+      cursor:pointer;
+    }
+    .embed-toggle:hover{
+      background:#f9fafc;
+    }
+    .embed-panel[hidden]{display:none;}
+    .embed-panel{
+      margin-top:.6rem;
+    }
+    .embed-panel small{
+      font-size:.78rem;
+      color:var(--ink-muted);
+    }
+    .embed-block{
+      margin-top:.55rem;
+    }
+    .embed-block label{
+      display:block;
+      font-size:.8rem;
+      font-weight:700;
+      margin-bottom:.25rem;
+    }
+    .embed-block textarea{
+      width:100%;
+      height:120px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      padding:.6rem .7rem;
+      font:12px/1.4 ui-monospace,Consolas,Monaco,monospace;
+      resize:none;
+      background:#ffffff;
+      color:var(--ink);
+    }
+
+    .footnote{
+      margin-top:.9rem;
+      font-size:.78rem;
+      color:var(--ink-muted);
+      text-align:center;
+      max-width:780px;
+      margin-left:auto;
+      margin-right:auto;
+    }
+
+    @media (max-width:700px){
+      body{
+        padding:1.4rem .9rem 2.4rem;
+      }
+      .card{
+        padding:1.25rem 1.1rem 1.4rem;
+      }
+      .tables-wrapper{
+        grid-template-columns:1fr;
+      }
+      h1{
+        font-size:1.45rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <section class="card">
+    <div class="eyebrow">Vegas Insider · Data-Driven Odds</div>
+    <h1>Winter Burnout Odds Index 2025</h1>
+    <p class="subhead">Burnout probability by U.S. state.</p>
+
+    <div class="gradient-bar-labels">
+      <span>Lowest burnout odds</span>
+      <span>Highest burnout odds</span>
+    </div>
+    <div class="gradient-strip" aria-hidden="true"></div>
+
+    <!-- Map -->
+    <div class="map-wrapper">
+      <svg id="burnout-map"
+           viewBox="0 0 975 610"
+           role="img"
+           aria-labelledby="map-title map-desc">
+        <title id="map-title">Winter Burnout Odds Index 2025 — burnout probability by U.S. state</title>
+        <desc id="map-desc">
+          Choropleth map of winter burnout probability by U.S. state, shaded from blue
+          in the lowest-risk states to orange and red in the highest-risk states.
+        </desc>
+      </svg>
+    </div>
+
+    <!-- Caption & source -->
+    <p class="map-caption">
+      Modeled winter burnout odds for every U.S. state, using national health, work, cost, activity, and anxiety data. Cooler blues mark lower burnout odds; warmer oranges and reds mark higher odds.
+    </p>
+    <p class="map-caption map-caption--source">
+      <strong>Source:</strong> VegasInsider analysis of national health, labor, and cost datasets. All figures are model-based estimates.
+    </p>
+
+    <!-- Tables -->
+    <div class="tables-wrapper">
+      <!-- Highest burnout odds -->
+      <div>
+        <h2>States With the Highest Winter Burnout Odds</h2>
+        <p class="map-caption" style="margin-top:.1rem;">
+          Ranked by modeled burnout probability.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>State</th>
+              <th>Burnout Prob. (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="pill pill--high">1</span></td><td>Louisiana</td><td>6.51</td></tr>
+            <tr><td><span class="pill pill--high">2</span></td><td>West Virginia</td><td>6.31</td></tr>
+            <tr><td><span class="pill pill--high">3</span></td><td>Kentucky</td><td>4.56</td></tr>
+            <tr><td><span class="pill pill--high">4</span></td><td>Texas</td><td>3.65</td></tr>
+            <tr><td><span class="pill pill--high">5</span></td><td>Alabama</td><td>3.17</td></tr>
+            <tr><td><span class="pill pill--high">6</span></td><td>Nevada</td><td>3.12</td></tr>
+            <tr><td><span class="pill pill--high">7</span></td><td>Mississippi</td><td>2.87</td></tr>
+            <tr><td><span class="pill pill--high">8</span></td><td>Arizona</td><td>2.80</td></tr>
+            <tr><td><span class="pill pill--high">9</span></td><td>Ohio</td><td>2.60</td></tr>
+            <tr><td><span class="pill pill--high">10</span></td><td>Michigan</td><td>2.56</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Lowest burnout odds -->
+      <div>
+        <h2>States With the Lowest Winter Burnout Odds</h2>
+        <p class="map-caption" style="margin-top:.1rem;">
+          Ranked by modeled burnout probability.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>State</th>
+              <th>Burnout Prob. (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="pill pill--low">1</span></td><td>South Dakota</td><td>0.51</td></tr>
+            <tr><td><span class="pill pill--low">2</span></td><td>Nebraska</td><td>0.26</td></tr>
+            <tr><td><span class="pill pill--low">3</span></td><td>Minnesota</td><td>0.28</td></tr>
+            <tr><td><span class="pill pill--low">4</span></td><td>Maryland</td><td>0.29</td></tr>
+            <tr><td><span class="pill pill--low">5</span></td><td>Connecticut</td><td>0.30</td></tr>
+            <tr><td><span class="pill pill--low">6</span></td><td>Wisconsin</td><td>0.32</td></tr>
+            <tr><td><span class="pill pill--low">7</span></td><td>Hawaii</td><td>0.32</td></tr>
+            <tr><td><span class="pill pill--low">8</span></td><td>Virginia</td><td>0.34</td></tr>
+            <tr><td><span class="pill pill--low">9</span></td><td>Utah</td><td>0.35</td></tr>
+            <tr><td><span class="pill pill--low">10</span></td><td>Iowa</td><td>0.36</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Share / embed -->
+    <div class="share">
+      <h3>Share / Embed</h3>
+      <button type="button" id="embedToggle" class="embed-toggle"
+              aria-controls="embedPanel" aria-expanded="false">
+        Get Embed Code
+      </button>
+
+      <div id="embedPanel" class="embed-panel" hidden>
+        <small>Copy and paste the embed you need below. All values are model-based estimates.</small>
+
+        <div class="embed-block">
+          <label for="embed-iframe">Interactive (iframe)</label>
+          <textarea id="embed-iframe" readonly onclick="this.select()"></textarea>
+        </div>
+
+        <div class="embed-block">
+          <label for="embed-static">Static (no JS)</label>
+          <textarea id="embed-static" readonly onclick="this.select()"></textarea>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p class="footnote">
+    Figures represent modeled winter burnout probability and implied odds, not predictions for any specific individual.
+  </p>
+</main>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+  const CANONICAL_URL = "https://www.vegasinsider.com/winter-burnout-odds-index-2025";
+
+  // Burnout data keyed by state name (includes D.C. for the map, but not in rank tables)
+  const burnoutData = {
+    "Louisiana":  { abbr:"LA", prob:6.51, moneyline:"+1436" },
+    "West Virginia": { abbr:"WV", prob:6.31, moneyline:"+1485" },
+    "Kentucky":  { abbr:"KY", prob:4.56, moneyline:"+2093" },
+    "Texas":     { abbr:"TX", prob:3.65, moneyline:"+2640" },
+    "District of Columbia": { abbr:"DC", prob:3.30, moneyline:"+2930" },
+    "Alabama":   { abbr:"AL", prob:3.17, moneyline:"+3055" },
+    "Nevada":    { abbr:"NV", prob:3.12, moneyline:"+3105" },
+    "Mississippi": { abbr:"MS", prob:2.87, moneyline:"+3384" },
+    "Arizona":   { abbr:"AZ", prob:2.80, moneyline:"+3471" },
+    "Ohio":      { abbr:"OH", prob:2.60, moneyline:"+3746" },
+    "Michigan":  { abbr:"MI", prob:2.56, moneyline:"+3806" },
+    "Florida":   { abbr:"FL", prob:2.49, moneyline:"+3916" },
+    "Alaska":    { abbr:"AK", prob:2.44, moneyline:"+3998" },
+    "South Carolina": { abbr:"SC", prob:2.33, moneyline:"+4192" },
+    "California": { abbr:"CA", prob:2.31, moneyline:"+4229" },
+    "Tennessee": { abbr:"TN", prob:2.26, moneyline:"+4325" },
+    "Arkansas":  { abbr:"AR", prob:2.24, moneyline:"+4364" },
+    "Georgia":   { abbr:"GA", prob:2.17, moneyline:"+4508" },
+    "Pennsylvania": { abbr:"PA", prob:2.07, moneyline:"+4731" },
+    "New Mexico": { abbr:"NM", prob:2.02, moneyline:"+4850" },
+    "Oklahoma": { abbr:"OK", prob:1.94, moneyline:"+5055" },
+    "Oregon":   { abbr:"OR", prob:1.93, moneyline:"+5081" },
+    "Indiana":  { abbr:"IN", prob:1.85, moneyline:"+5305" },
+    "Idaho":    { abbr:"ID", prob:1.74, moneyline:"+5647" },
+    "Illinois": { abbr:"IL", prob:1.61, moneyline:"+6111" },
+    "Missouri": { abbr:"MO", prob:1.57, moneyline:"+6269" },
+    "North Carolina": { abbr:"NC", prob:1.55, moneyline:"+6352" },
+    "Maine":    { abbr:"ME", prob:1.51, moneyline:"+6523" },
+    "Washington": { abbr:"WA", prob:1.46, moneyline:"+6749" },
+    "North Dakota": { abbr:"ND", prob:1.43, moneyline:"+6893" },
+    "New York": { abbr:"NY", prob:1.43, moneyline:"+6893" },
+    "Colorado": { abbr:"CO", prob:1.38, moneyline:"+7146" },
+    "Delaware": { abbr:"DE", prob:1.29, moneyline:"+7652" },
+    "Montana":  { abbr:"MT", prob:1.26, moneyline:"+7837" },
+    "Rhode Island": { abbr:"RI", prob:1.21, moneyline:"+8164" },
+    "Vermont":  { abbr:"VT", prob:1.21, moneyline:"+8164" },
+    "Wyoming":  { abbr:"WY", prob:1.17, moneyline:"+8447" },
+    "Massachusetts": { abbr:"MA", prob:1.14, moneyline:"+8672" },
+    "Kansas":   { abbr:"KS", prob:1.13, moneyline:"+8750" },
+    "New Jersey": { abbr:"NJ", prob:1.06, moneyline:"+9334" },
+    "New Hampshire": { abbr:"NH", prob:1.06, moneyline:"+9334" },
+    "Iowa":     { abbr:"IA", prob:1.03, moneyline:"+9609" },
+    "Utah":     { abbr:"UT", prob:0.99, moneyline:"+10001" },
+    "Virginia": { abbr:"VA", prob:0.95, moneyline:"+10426" },
+    "Hawaii":   { abbr:"HI", prob:0.88, moneyline:"+11264" },
+    "Wisconsin": { abbr:"WI", prob:0.87, moneyline:"+11394" },
+    "Connecticut": { abbr:"CT", prob:0.83, moneyline:"+11948" },
+    "Maryland": { abbr:"MD", prob:0.80, moneyline:"+12400" },
+    "Minnesota": { abbr:"MN", prob:0.75, moneyline:"+13233" },
+    "Nebraska": { abbr:"NE", prob:0.70, moneyline:"+14186" },
+    "South Dakota": { abbr:"SD", prob:0.51, moneyline:"+19508" }
+  };
+
+  // Color bands using medium-contrast palette
+  function colorForProb(p){
+    if (p >= 6.0) return "#E24A3B"; // very high
+    if (p >= 4.5) return "#F88A50"; // high
+    if (p >= 3.0) return "#FFB866"; // mid-high
+    if (p >= 1.6) return "#FFD08A"; // mid
+    if (p >= 0.8) return "#82AFFF"; // low-mid
+    return "#A5C6FF";               // lowest
+  }
+
+  const svg = d3.select("#burnout-map");
+  const tooltip = d3.select("#tooltip");
+
+  const width = 975;
+  const height = 610;
+  const projection = d3.geoAlbersUsa()
+    .scale(1300)
+    .translate([width / 2, height / 2]);
+  const path = d3.geoPath(projection);
+
+  d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json").then(us => {
+    const states = topojson.feature(us, us.objects.states).features;
+
+    svg
+      .attr("viewBox", `0 0 ${width} ${height}`)
+      .selectAll("path")
+      .data(states)
+      .join("path")
+      .attr("class", "state")
+      .attr("d", path)
+      .attr("fill", d => {
+        const name = d.properties && d.properties.name;
+        const data = burnoutData[name];
+        return data ? colorForProb(data.prob) : "#e5e7f0";
+      })
+      .on("mousemove", (event, d) => {
+        const name = d.properties && d.properties.name;
+        const data = burnoutData[name];
+        if (!data){
+          tooltip.style("display","none");
+          return;
+        }
+
+        tooltip
+          .style("display","block")
+          .html(
+            `<strong>${name} (${data.abbr})</strong>
+             <span>Burnout prob: ${data.prob.toFixed(2)}%</span>
+             <span>Moneyline: ${data.moneyline}</span>`
+          );
+
+        const ttNode = tooltip.node();
+        const rect = ttNode.getBoundingClientRect();
+        const margin = 8;
+        let x = event.pageX + 14;
+        let y = event.pageY + 14;
+
+        if (x + rect.width > window.innerWidth - margin) {
+          x = window.innerWidth - rect.width - margin;
+        }
+        if (y + rect.height > window.innerHeight - margin) {
+          y = window.innerHeight - rect.height - margin;
+        }
+
+        tooltip.style("left", x + "px").style("top", y + "px");
+      })
+      .on("mouseout", () => {
+        tooltip.style("display","none");
+      });
+  });
+
+  /* ------- EMBED LOGIC ------- */
+  const embedToggle = document.getElementById("embedToggle");
+  const embedPanel  = document.getElementById("embedPanel");
+  const taIframe    = document.getElementById("embed-iframe");
+  const taStatic    = document.getElementById("embed-static");
+
+  if (taIframe) {
+    taIframe.value =
+`<!-- BEGIN: VegasInsider — Winter Burnout Odds Index 2025 (Interactive Map) -->
+<div style="max-width:960px;margin:16px auto;">
+  <iframe src="${CANONICAL_URL}" width="100%" height="620" loading="lazy"
+          style="border:1px solid #dde2f0;border-radius:12px;background:#ffffff"
+          title="Winter Burnout Odds Index 2025 — burnout probability by U.S. state"></iframe>
+  <p style="text-align:right;font-size:12px;color:#7e8896;margin-top:6px;">
+    Source: <a href="${CANONICAL_URL}" target="_blank" rel="noopener"
+              style="color:#4a7dff;text-decoration:none;border-bottom:1px dotted currentColor;">
+      VegasInsider — Winter Burnout Odds Index 2025
+    </a> (model-based probabilities).
+  </p>
+</div>
+<!-- END: Interactive Map -->`;
+  }
+
+  if (taStatic) {
+    taStatic.value =
+`<!-- BEGIN: Winter Burnout Odds Map (Static, No JS) -->
+<figure style="max-width:960px;margin:16px auto;background:#ffffff;border:1px solid #dde2f0;border-radius:12px;overflow:hidden;padding:12px;">
+  <img src="YOUR-MAP-IMAGE-URL.png"
+       alt="Map of U.S. states shaded by modeled winter burnout probability, from lower odds in blue to higher odds in orange and red."
+       style="width:100%;display:block;border-radius:8px;">
+  <figcaption style="margin-top:6px;font:12px/1.4 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#555;">
+    Winter Burnout Odds Index 2025 — modeled winter burnout probability across all 50 U.S. states. Source:
+    <a href="${CANONICAL_URL}" target="_blank" rel="noopener"
+       style="color:#4a7dff;text-decoration:none;border-bottom:1px dotted currentColor;">
+       VegasInsider
+    </a>.
+  </figcaption>
+</figure>
+<!-- END: Static Embed -->`;
+  }
+
+  if (embedToggle && embedPanel) {
+    embedToggle.addEventListener("click", () => {
+      const hidden = embedPanel.hasAttribute("hidden");
+      if (hidden) {
+        embedPanel.removeAttribute("hidden");
+        embedToggle.setAttribute("aria-expanded","true");
+        embedToggle.textContent = "Hide Embed Code";
+      } else {
+        embedPanel.setAttribute("hidden","");
+        embedToggle.setAttribute("aria-expanded","false");
+        embedToggle.textContent = "Get Embed Code";
+      }
+    });
+  }
+</script>
+</body>
+</html>
