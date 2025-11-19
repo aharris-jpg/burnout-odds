@@ -1,4 +1,4 @@
-<section id="wb-professions" class="wb-professions" role="region" aria-labelledby="wb-prof-title">
+    <section id="wb-professions" class="wb-professions" role="region" aria-labelledby="wb-prof-title">
   <style>
     #wb-professions,
     #wb-professions * {
@@ -102,7 +102,7 @@
 
     .wb-prof-headrow {
       display: grid;
-      grid-template-columns: 32px minmax(0, 1.5fr) minmax(0, 1fr);
+      grid-template-columns: 32px minmax(0, 1.6fr) minmax(0, 1.3fr) minmax(0, 1.3fr);
       gap: 0.5rem;
       padding: 0.25rem 0.25rem 0.35rem;
       font-size: 0.74rem;
@@ -118,7 +118,7 @@
 
     .wb-prof-row {
       display: grid;
-      grid-template-columns: 32px minmax(0, 1.5fr) minmax(0, 1fr);
+      grid-template-columns: 32px minmax(0, 1.6fr) minmax(0, 1.3fr) minmax(0, 1.3fr);
       gap: 0.5rem;
       align-items: center;
       padding: 0.35rem 0.25rem;
@@ -146,7 +146,7 @@
     .wb-prof-meta {
       font-size: 0.78rem;
       color: var(--ink-soft);
-      margin-top: 0.05rem;
+      font-variant-numeric: tabular-nums;
     }
 
     .wb-prof-barcell {
@@ -280,10 +280,18 @@
       .wb-prof-table {
         padding: 0.55rem 0.85rem 0.7rem;
       }
+
+      /* On mobile: hide the Hours & pay column to reduce density */
+      .wb-prof-headrow > div:nth-child(3),
+      .wb-prof-row .wb-prof-meta {
+        display: none;
+      }
+
       .wb-prof-row,
       .wb-prof-headrow {
-        grid-template-columns: 26px minmax(0, 1.6fr) minmax(0, 1fr);
+        grid-template-columns: 26px minmax(0, 1.6fr) minmax(0, 1.3fr);
       }
+
       .wb-prof-barcell {
         height: 24px;
       }
@@ -325,6 +333,7 @@
     <div class="wb-prof-headrow" aria-hidden="true">
       <div>#</div>
       <div>Profession</div>
+      <div>Hours &amp; pay</div>
       <div>Burnout odds</div>
     </div>
 
@@ -349,7 +358,7 @@
     </a>.
   </p>
 
-  <!-- NEW: Share / Embed block -->
+  <!-- Share / Embed block -->
   <div class="wb-prof-share">
     <h3>Share / Embed</h3>
     <button type="button"
@@ -368,7 +377,7 @@
         <textarea id="wb-prof-embed-iframe" readonly onclick="this.select()"></textarea>
       </div>
 
-      <div class="wb-prof-embed-embed-block wb-prof-embed-block">
+      <div class="wb-prof-embed-block">
         <label for="wb-prof-embed-static">Static (no JS)</label>
         <textarea id="wb-prof-embed-static" readonly onclick="this.select()"></textarea>
       </div>
@@ -470,10 +479,8 @@
       return `
         <div class="wb-prof-row" aria-label="${name} — ${probLabel} burnout odds">
           <div class="wb-prof-rank">${i+1}</div>
-          <div>
-            <div class="wb-prof-name">${name}</div>
-            <div class="wb-prof-meta">${metaLine}</div>
-          </div>
+          <div class="wb-prof-name">${name}</div>
+          <div class="wb-prof-meta">${metaLine}</div>
           <div class="wb-prof-barcell">
             <div class="wb-prof-bar" style="width:${width};"></div>
             <div class="wb-prof-val">${probLabel}</div>
