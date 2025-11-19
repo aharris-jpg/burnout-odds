@@ -1,0 +1,424 @@
+<section id="wb-professions" class="wb-professions" role="region" aria-labelledby="wb-prof-title">
+  <style>
+    #wb-professions,
+    #wb-professions * {
+      box-sizing: border-box;
+    }
+
+    #wb-professions {
+      --ink:#17222f;
+      --ink-soft:#5d6a79;
+      --ink-muted:#7e8896;
+      --shell:#f6f7fb;
+      --shell-soft:#f1f3f9;
+      --accent-blue:#4a7dff;
+      --accent-blue-soft:#e1e8ff;
+      --accent:#ff4d5c;
+
+      max-width: 900px;
+      margin: 0 auto 2rem;
+      border-radius: 14px;
+      border: 1px solid rgba(12,22,39,0.06);
+      background: #ffffff;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.04);
+      font: 14px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      color: var(--ink);
+      overflow: hidden;
+    }
+
+    #wb-professions__head {
+      padding: 1rem 1.25rem 0.5rem;
+      border-bottom: 1px solid rgba(12,22,39,0.06);
+      background: radial-gradient(circle at top left,#ffffff 0,#f6f7fb 46%,#f1f3f9 100%);
+    }
+
+    #wb-prof-title {
+      margin: 0 0 0.15rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    #wb-prof-sub {
+      margin: 0;
+      font-size: 0.86rem;
+      color: var(--ink-soft);
+    }
+
+    .wb-prof-toggle-wrap {
+      margin-top: 0.7rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 0.7rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .wb-prof-toggle {
+      display: inline-flex;
+      border-radius: 999px;
+      border: 1px solid rgba(12,22,39,0.1);
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .wb-prof-toggle button {
+      border: none;
+      padding: 0.32rem 0.7rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      background: transparent;
+      color: var(--ink-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+    }
+
+    .wb-prof-toggle button[aria-pressed="true"] {
+      background: var(--accent-blue-soft);
+      color: #16305f;
+    }
+
+    .wb-prof-toggle button:focus-visible {
+      outline: 2px solid var(--accent-blue);
+      outline-offset: 2px;
+      z-index: 1;
+    }
+
+    #wb-prof-meta {
+      margin: 0;
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+    }
+
+    /* Table / rows */
+    .wb-prof-table {
+      padding: 0.6rem 1.0rem 0.8rem;
+    }
+
+    .wb-prof-headrow {
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1.5fr) minmax(0, 1fr);
+      gap: 0.5rem;
+      padding: 0.25rem 0.25rem 0.35rem;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--ink-muted);
+      border-bottom: 1px solid rgba(12,22,39,0.06);
+    }
+
+    .wb-prof-rows {
+      margin: 0.35rem 0 0;
+    }
+
+    .wb-prof-row {
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1.5fr) minmax(0, 1fr);
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.35rem 0.25rem;
+      border-radius: 8px;
+    }
+
+    .wb-prof-row:nth-child(odd) {
+      background: rgba(245,247,252,0.55);
+    }
+
+    .wb-prof-rank {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.82rem;
+      text-align: center;
+      color: var(--ink-muted);
+    }
+
+    .wb-prof-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .wb-prof-meta {
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+      margin-top: 0.05rem;
+    }
+
+    .wb-prof-barcell {
+      position: relative;
+      height: 26px;
+      border-radius: 999px;
+      background: #edf0f7;
+      overflow: hidden;
+    }
+
+    .wb-prof-bar {
+      position: absolute;
+      inset: 0 auto 0 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg,#c3cff7,#4a7dff);
+      width: 0;
+    }
+
+    .wb-prof-val {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-variant-numeric: tabular-nums;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #14213d;
+      background: rgba(255,255,255,0.9);
+      padding: 1px 6px;
+      border-radius: 999px;
+    }
+
+    #wb-prof-fallback {
+      font-size: 0.86rem;
+      padding: 0.3rem 0.3rem 0.5rem;
+      margin: 0;
+    }
+
+    #wb-prof-fallback li {
+      margin-bottom: 0.15rem;
+    }
+
+    .wb-prof-source {
+      margin: 0.25rem 1.1rem 0.9rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid rgba(12,22,39,0.06);
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+    }
+
+    .wb-prof-source a {
+      color: var(--accent-blue);
+      text-decoration: none;
+    }
+
+    .wb-prof-source a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+      #wb-professions {
+        border-radius: 12px;
+      }
+      #wb-professions__head {
+        padding: 0.85rem 0.9rem 0.55rem;
+      }
+      .wb-prof-table {
+        padding: 0.55rem 0.85rem 0.7rem;
+      }
+      .wb-prof-row,
+      .wb-prof-headrow {
+        grid-template-columns: 26px minmax(0, 1.6fr) minmax(0, 1fr);
+      }
+      .wb-prof-barcell {
+        height: 24px;
+      }
+    }
+  </style>
+
+  <header id="wb-professions__head">
+    <h2 id="wb-prof-title">Professions with the highest winter burnout odds</h2>
+    <p id="wb-prof-sub">
+      Burnout probabilities by job, modeled from hours, pay, injury risk, time pressure, emotional load, and conflict exposure.
+    </p>
+
+    <div class="wb-prof-toggle-wrap">
+      <div class="wb-prof-toggle" role="tablist" aria-label="Select burnout ordering">
+        <button type="button"
+                id="wb-tab-high"
+                role="tab"
+                aria-selected="true"
+                aria-pressed="true"
+                data-view="high">
+          Highest burnout odds
+        </button>
+        <button type="button"
+                id="wb-tab-low"
+                role="tab"
+                aria-selected="false"
+                aria-pressed="false"
+                data-view="low">
+          Lowest burnout odds
+        </button>
+      </div>
+      <p id="wb-prof-meta" aria-live="polite">
+        Ordered by highest burnout odds · Bars show burnout probability (%).
+      </p>
+    </div>
+  </header>
+
+  <div class="wb-prof-table">
+    <div class="wb-prof-headrow" aria-hidden="true">
+      <div>#</div>
+      <div>Profession</div>
+      <div>Burnout odds</div>
+    </div>
+
+    <div id="wb-prof-rows" class="wb-prof-rows" aria-live="polite">
+      <!-- No-JS fallback (highest odds, top 5) -->
+      <ol id="wb-prof-fallback">
+        <li>Hospital Nurse (Inpatient) — 6.9% burnout odds</li>
+        <li>Emergency Room Physician — 6.6%</li>
+        <li>Primary Care Physician — 6.2%</li>
+        <li>Social Worker (Child &amp; Family) — 6.0%</li>
+        <li>Teacher (K–12) — 5.6%</li>
+      </ol>
+    </div>
+  </div>
+
+  <p class="wb-prof-source">
+    <strong>Source:</strong> VegasInsider analysis of occupational health, wage, hours, and risk data, modeled into implied winter burnout probabilities.
+    View the full study at
+    <a href="https://www.vegasinsider.com/winter-burnout-odds-index-2025"
+       target="_blank" rel="noopener">
+      vegasinsider.com/winter-burnout-odds-index-2025
+    </a>.
+  </p>
+</section>
+
+<script>
+(function(){
+  const CANONICAL_URL = "https://www.vegasinsider.com/winter-burnout-odds-index-2025";
+
+  // DATA: profession, hours/week, median pay (USD), burnout score 0–1, burnout probability %
+  const RAW = [
+    ["Hospital Nurse (Inpatient)", 44,  76000, 0.83, 6.90],
+    ["Emergency Room Physician",   52, 250000, 0.82, 6.60],
+    ["Primary Care Physician",     50, 215000, 0.80, 6.20],
+    ["Social Worker (Child & Family)", 42, 58000, 0.79, 6.00],
+    ["Teacher (K–12)",             45,  62000, 0.77, 5.60],
+    ["Paramedic / EMT",            46,  52000, 0.76, 5.40],
+    ["Resident Doctor (Training)", 60,  70000, 0.75, 5.20],
+    ["Corrections Officer",        43,  56000, 0.74, 5.00],
+    ["Customer Support Agent (Call Center)", 41, 43000, 0.72, 4.80],
+    ["Restaurant Manager",         50,  58000, 0.71, 4.60],
+    ["ICU Nurse",                  44,  82000, 0.70, 4.40],
+    ["Psychotherapist / Counselor",38,  78000, 0.69, 4.20],
+    ["Journalist / Reporter",      47,  67000, 0.68, 4.10],
+    ["Airline Pilot (Commercial)", 45, 190000, 0.67, 3.90],
+    ["Police Officer",             44,  72000, 0.66, 3.80],
+    ["Retail Store Manager",       46,  55000, 0.64, 3.60],
+    ["Hotel Front Desk Supervisor",42,  46000, 0.63, 3.40],
+    ["Attorney (Litigation)",      50, 150000, 0.62, 3.30],
+    ["Software Engineer (Product)",41, 130000, 0.61, 3.10],
+    ["Marketing Manager",          44,  98000, 0.60, 3.00],
+    ["HR Manager",                 42,  90000, 0.59, 2.90],
+    ["Financial Analyst",          45,  92000, 0.58, 2.80],
+    ["Pharmacist (Retail)",        41, 128000, 0.57, 2.60],
+    ["Delivery Driver (Parcel)",   43,  52000, 0.56, 2.50],
+    ["Construction Laborer",       44,  52000, 0.55, 2.40],
+    ["Chef / Head Cook",           50,  60000, 0.54, 2.30],
+    ["Factory / Assembly Worker",  42,  48000, 0.53, 2.20],
+    ["Call Center Team Lead",      43,  52000, 0.52, 2.10],
+    ["University Lecturer",        40,  83000, 0.51, 2.00],
+    ["Graphic Designer (Agency)",  40,  65000, 0.50, 1.90],
+    ["Data Analyst",               39,  80000, 0.49, 1.80],
+    ["IT Support Specialist",      40,  65000, 0.48, 1.70],
+    ["Real Estate Agent",          42,  75000, 0.47, 1.70],
+    ["Flight Attendant",           38,  62000, 0.46, 1.60],
+    ["Librarian",                  37,  62000, 0.45, 1.50],
+    ["Administrative Assistant",   38,  49000, 0.44, 1.40],
+    ["Insurance Claims Adjuster",  40,  72000, 0.43, 1.40],
+    ["Quality Assurance Inspector",39,  56000, 0.42, 1.30],
+    ["Mechanical Engineer",        41,  96000, 0.41, 1.30],
+    ["Project Manager (Construction)",45, 98000, 0.40, 1.20],
+    ["Accountant / Auditor",       40,  78000, 0.39, 1.20],
+    ["Product Manager (Tech)",     43, 140000, 0.38, 1.10],
+    ["UX / UI Designer",           39,  95000, 0.37, 1.10],
+    ["Lab Technician (Clinical)",  38,  58000, 0.36, 1.00],
+    ["Paralegal",                  39,  62000, 0.35, 1.00],
+    ["Environmental Scientist",    38,  78000, 0.34, 0.90],
+    ["Software Tester / QA Engineer",39,78000,0.33,0.90],
+    ["Technical Writer",           37,  72000, 0.32, 0.80],
+    ["Research Scientist (Academic)",42,90000,0.31,0.80],
+    ["Graphic Designer (In-House, Corporate)",37,62000,0.30,0.70]
+  ];
+
+  const rowsHost = document.getElementById("wb-prof-rows");
+  const metaEl   = document.getElementById("wb-prof-meta");
+  const root     = document.getElementById("wb-professions");
+
+  function formatPay(n){
+    return "$" + new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(n);
+  }
+  function formatPct(n){
+    return n.toFixed(1).replace(/\.0$/,"") + "%";
+  }
+
+  function render(view){
+    const byProb = [...RAW].sort((a,b)=> b[4] - a[4]); // index 4 = burnout probability %
+    let arr;
+    let label;
+
+    if (view === "low") {
+      arr = [...RAW].sort((a,b)=> a[4] - b[4]).slice(0,10);
+      label = "Ordered by lowest burnout odds · Bars show burnout probability (%).";
+      if (root) root.setAttribute("data-view","low");
+    } else {
+      arr = byProb.slice(0,10);
+      label = "Ordered by highest burnout odds · Bars show burnout probability (%).";
+      if (root) root.setAttribute("data-view","high");
+    }
+
+    const maxProb = Math.max(...arr.map(d => d[4]));
+
+    rowsHost.innerHTML = arr.map((d,i)=>{
+      const [name, hours, pay, score, prob] = d;
+      const width = (prob / maxProb * 100).toFixed(1) + "%";
+      const probLabel = formatPct(prob);
+      const metaLine = `≈ ${hours} hrs/week · ${formatPay(pay)} median pay`;
+      return `
+        <div class="wb-prof-row" aria-label="${name} — ${probLabel} burnout odds">
+          <div class="wb-prof-rank">${i+1}</div>
+          <div>
+            <div class="wb-prof-name">${name}</div>
+            <div class="wb-prof-meta">${metaLine}</div>
+          </div>
+          <div class="wb-prof-barcell">
+            <div class="wb-prof-bar" style="width:${width};"></div>
+            <div class="wb-prof-val">${probLabel}</div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    if (metaEl) metaEl.textContent = label;
+
+    const fb = document.getElementById("wb-prof-fallback");
+    if (fb && fb.parentNode) fb.parentNode.removeChild(fb);
+  }
+
+  function initToggle(){
+    const tabHigh = document.getElementById("wb-tab-high");
+    const tabLow  = document.getElementById("wb-tab-low");
+    if (!tabHigh || !tabLow) return;
+
+    function setView(view){
+      render(view);
+      const isHigh = view === "high";
+      tabHigh.setAttribute("aria-pressed", isHigh ? "true" : "false");
+      tabLow.setAttribute("aria-pressed",  isHigh ? "false" : "true");
+      tabHigh.setAttribute("aria-selected", isHigh ? "true" : "false");
+      tabLow.setAttribute("aria-selected",  isHigh ? "false" : "true");
+    }
+
+    tabHigh.addEventListener("click", ()=> setView("high"));
+    tabLow.addEventListener("click",  ()=> setView("low"));
+
+    // default: highest odds
+    setView("high");
+  }
+
+  initToggle();
+})();
+</script>
