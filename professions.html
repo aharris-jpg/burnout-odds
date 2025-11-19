@@ -190,7 +190,7 @@
     }
 
     .wb-prof-source {
-      margin: 0.25rem 1.1rem 0.9rem;
+      margin: 0.25rem 1.1rem 0.4rem;
       padding-top: 0.5rem;
       border-top: 1px solid rgba(12,22,39,0.06);
       font-size: 0.78rem;
@@ -204,6 +204,70 @@
 
     .wb-prof-source a:hover {
       text-decoration: underline;
+    }
+
+    /* NEW: Share / Embed styles (namespaced, do not affect existing layout) */
+    .wb-prof-share {
+      margin: 0.2rem 1.1rem 0.9rem;
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+    }
+
+    .wb-prof-share h3 {
+      margin: 0 0 0.4rem;
+      font-size: 0.9rem;
+      color: var(--ink);
+    }
+
+    .wb-prof-embed-toggle {
+      appearance: none;
+      border: 1px solid #dde2f0;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 0.4rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .wb-prof-embed-toggle:hover {
+      background: #f9fafc;
+    }
+
+    .wb-prof-embed-panel[hidden] {
+      display: none;
+    }
+
+    .wb-prof-embed-panel {
+      margin-top: 0.6rem;
+    }
+
+    .wb-prof-embed-panel small {
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+    }
+
+    .wb-prof-embed-block {
+      margin-top: 0.55rem;
+    }
+
+    .wb-prof-embed-block label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .wb-prof-embed-block textarea {
+      width: 100%;
+      height: 110px;
+      border-radius: 10px;
+      border: 1px solid #dde2f0;
+      padding: 0.6rem 0.7rem;
+      font: 12px/1.4 ui-monospace,Consolas,Monaco,monospace;
+      resize: none;
+      background: #ffffff;
+      color: var(--ink);
     }
 
     @media (max-width: 640px) {
@@ -284,6 +348,32 @@
       vegasinsider.com/winter-burnout-odds-index-2025
     </a>.
   </p>
+
+  <!-- NEW: Share / Embed block -->
+  <div class="wb-prof-share">
+    <h3>Share / Embed</h3>
+    <button type="button"
+            id="wb-prof-embedToggle"
+            class="wb-prof-embed-toggle"
+            aria-controls="wb-prof-embedPanel"
+            aria-expanded="false">
+      Get Embed Code
+    </button>
+
+    <div id="wb-prof-embedPanel" class="wb-prof-embed-panel" hidden>
+      <small>Copy and paste the embed you need below. All values are model-based estimates.</small>
+
+      <div class="wb-prof-embed-block">
+        <label for="wb-prof-embed-iframe">Interactive (iframe)</label>
+        <textarea id="wb-prof-embed-iframe" readonly onclick="this.select()"></textarea>
+      </div>
+
+      <div class="wb-prof-embed-embed-block wb-prof-embed-block">
+        <label for="wb-prof-embed-static">Static (no JS)</label>
+        <textarea id="wb-prof-embed-static" readonly onclick="this.select()"></textarea>
+      </div>
+    </div>
+  </div>
 </section>
 
 <script>
@@ -420,5 +510,63 @@
   }
 
   initToggle();
+
+  /* ------- EMBED LOGIC FOR PROFESSIONS BLOCK ------- */
+  const PROF_URL          = CANONICAL_URL + "#wb-professions";
+  const profEmbedToggle   = document.getElementById("wb-prof-embedToggle");
+  const profEmbedPanel    = document.getElementById("wb-prof-embedPanel");
+  const profTaIframe      = document.getElementById("wb-prof-embed-iframe");
+  const profTaStatic      = document.getElementById("wb-prof-embed-static");
+
+  if (profTaIframe) {
+    profTaIframe.value =
+`<!-- BEGIN: VegasInsider — Winter Burnout Odds by Profession (Interactive Embed) -->
+<div style="max-width:900px;margin:16px auto;">
+  <iframe src="${PROF_URL}" width="100%" height="520" loading="lazy"
+          style="border:1px solid #dde2f0;border-radius:14px;background:#ffffff"
+          title="Winter Burnout Odds by Profession — VegasInsider"></iframe>
+  <p style="text-align:right;font-size:12px;color:#7e8896;margin-top:6px;">
+    Source: <a href="${CANONICAL_URL}" target="_blank" rel="noopener"
+              style="color:#4a7dff;text-decoration:none;border-bottom:1px dotted currentColor;">
+      VegasInsider — Winter Burnout Odds Index 2025
+    </a> (model-based probabilities).
+  </p>
+</div>
+<!-- END: VegasInsider — Winter Burnout Odds by Profession (Interactive Embed) -->`;
+  }
+
+  if (profTaStatic) {
+    profTaStatic.value =
+`<!-- BEGIN: Winter Burnout Odds by Profession (Static, No JS) -->
+<figure style="max-width:900px;margin:16px auto;background:#ffffff;border:1px solid #dde2f0;border-radius:14px;overflow:hidden;padding:12px;font:14px/1.5 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#17222f;">
+  <img src="YOUR-PROFESSIONS-IMAGE-URL.png"
+       alt="Horizontal bar chart showing the professions with the highest and lowest modeled winter burnout odds."
+       style="width:100%;display:block;border-radius:10px;">
+  <figcaption style="margin-top:6px;font-size:12px;color:#555;">
+    Winter Burnout Odds by Profession — modeled burnout probabilities by job, based on hours, pay, risk, and emotional load.
+    Source:
+    <a href="${CANONICAL_URL}" target="_blank" rel="noopener"
+       style="color:#4a7dff;text-decoration:none;border-bottom:1px dotted currentColor;">
+      VegasInsider — Winter Burnout Odds Index 2025
+    </a>.
+  </figcaption>
+</figure>
+<!-- END: Winter Burnout Odds by Profession (Static, No JS) -->`;
+  }
+
+  if (profEmbedToggle && profEmbedPanel) {
+    profEmbedToggle.addEventListener("click", () => {
+      const hidden = profEmbedPanel.hasAttribute("hidden");
+      if (hidden) {
+        profEmbedPanel.removeAttribute("hidden");
+        profEmbedToggle.setAttribute("aria-expanded","true");
+        profEmbedToggle.textContent = "Hide Embed Code";
+      } else {
+        profEmbedPanel.setAttribute("hidden","");
+        profEmbedToggle.setAttribute("aria-expanded","false");
+        profEmbedToggle.textContent = "Get Embed Code";
+      }
+    });
+  }
 })();
 </script>
